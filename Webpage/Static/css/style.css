@@ -1,0 +1,991 @@
+/* === Reset & Base Styles === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background-color: #080d13;
+    color: white;
+}
+
+/* === Main Layout === */
+#app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* === Sidebar === */
+#sidebar {
+    width: 300px;
+    background-color: #121922;
+    border-right: 1px solid #1a2332;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    position: relative;
+    overflow-y: auto;
+}
+
+#logo {
+    padding: 20px 15px;
+    border-bottom: 1px solid #1a2332;
+    height: 60px;
+    display: flex;
+    align-items: center;
+}
+
+#logo h1 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.sidebar-section {
+    padding: 15px;
+    border-bottom: 1px solid #1a2332;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.sidebar-section h2 {
+    font-size: 16px;
+    color: #ffc300;
+    margin-bottom: 10px;
+    flex: 1;
+}
+
+.max-items-note {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 8px;
+}
+
+.add-button {
+    width: 22px;
+    height: 22px;
+    background-color: transparent;
+    border: 1px solid #ffc300;
+    border-radius: 4px;
+    color: #ffc300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 0;
+    z-index: 10;
+}
+
+.add-button:hover {
+    background-color: rgba(255, 195, 0, 0.2);
+}
+
+.sidebar-list {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+.sidebar-list li {
+    font-size: 14px;
+    margin-bottom: 6px;
+    padding-left: 5px;
+    color: #ddd;
+}
+
+.sidebar-list.scrollable {
+    max-height: 150px;
+    overflow-y: auto;
+    border-top: 1px solid #1a2332;
+    padding-top: 8px;
+}
+
+/* Projects section container with max height */
+.projects-container {
+    max-height: calc(8 * 1.7rem); /* Default size - 8 items */
+    overflow-y: auto;
+    margin-bottom: 10px;
+    transition: max-height 0.3s ease;
+}
+
+.projects-container.expanded {
+    max-height: calc(16 * 1.7rem); /* Doubled size - 16 items */
+}
+
+/* Project item styling */
+.project-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    margin-bottom: 5px;
+}
+
+.project-name {
+    display: inline-block;
+    font-weight: bold;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.project-name:hover {
+    text-decoration: underline;
+    color: #ffc300;
+}
+
+/* Project actions */
+.project-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.project-action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 3px;
+    opacity: 0.7;
+}
+
+.project-action-btn:hover {
+    opacity: 1;
+}
+
+.icon-image.small {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    /* Filter to make icons yellow */
+    filter: brightness(0) saturate(100%) invert(82%) sepia(64%) saturate(2765%) hue-rotate(360deg) brightness(99%) contrast(102%);
+}
+
+/* Chat styles under projects */
+.chat-list {
+    padding-left: 15px;
+    margin-top: 4px;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.chat-name {
+    max-width: 165px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.chat-name:hover {
+    color: #ffc300;
+}
+
+/* Chat actions styling (for Recent Chats and Older Chats) */
+.chat-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.chat-action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 3px;
+    opacity: 0.7;
+}
+
+.chat-action-btn:hover {
+    opacity: 1;
+}
+
+/* Gear icon SVG styling */
+.gear-icon {
+    width: 16px;
+    height: 16px;
+    fill: #ffc300;
+}
+
+/* === Main Content Area === */
+#content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+/* === Header Styling (Updated for Three Dots) === */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #1a2332;
+    height: 60px;
+    position: relative;
+}
+
+#project-chat-title {
+    color: #ffc300;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 0;
+}
+
+#project-name, #chat-name, .title-separator {
+    display: inline-block;
+    color: #ffc300;
+}
+
+.title-separator {
+    margin: 0 8px;
+}
+
+.options-dots {
+    display: flex;
+    gap: 5px;
+    cursor: pointer;
+    margin-left: auto; /* Push to the right */
+    position: relative;
+    z-index: 1; /* Ensure dots appear above the centered title */
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: #ffc300;
+    border-radius: 50%;
+}
+
+/* === Chat Display === */
+#chat-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+#chat-messages {
+    flex: 1;
+    padding: 80px 20px 15px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Message styling */
+.ai-message {
+    align-self: flex-start;
+    max-width: 80%;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background-color: #1a2332;
+    color: #ffc300;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.user-message {
+    align-self: flex-end;
+    max-width: 80%;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background-color: #2a3344;
+    color: white;
+    text-align: right;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Typing indicator */
+.ai-message.typing {
+    display: flex;
+    align-items: center;
+    font-style: italic;
+}
+
+.ai-message.typing::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    margin-left: 8px;
+    background-color: #ffc300;
+    border-radius: 50%;
+    animation: typing-pulse 1s infinite;
+}
+
+@keyframes typing-pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
+
+/* === Chat Input === */
+#chat-input-container {
+    padding: 20px;
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+}
+
+#user-input-wrapper {
+    width: 80%;
+    display: flex;
+    position: relative;
+    border: 2px solid #ffc300;
+    border-radius: 20px;
+    background-color: #1a2332;
+    padding: 16px 20px;
+    align-items: center;
+}
+
+.input-label {
+    position: absolute;
+    top: 8px;
+    left: 20px;
+    font-size: 11px;
+    color: #999;
+}
+
+#chat-input-field {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 21px;
+    outline: none;
+    padding: 10px 0 0 0;
+}
+
+.input-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.input-buttons button {
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+    border: 2px solid #ffc300;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 6px;
+}
+
+/* Make the icon images yellow */
+.icon-image {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(82%) sepia(64%) saturate(2765%) hue-rotate(360deg) brightness(99%) contrast(102%);
+}
+
+/* === Bottom Actions === */
+.bottom-actions {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #1a2332;
+    background-color: #121922;
+}
+
+.bottom-action-button {
+    padding: 8px 12px;
+    margin-right: 8px;
+    background-color: #1a2332;
+    border: 1px solid #2a3344;
+    border-radius: 4px;
+    color: #ffc300;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* === Scrollbar Styling === */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #121922;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #2a3344;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ffc300;
+}
+
+/* Scrollable Recent Chats */
+.scrollable-recent {
+    max-height: calc(5 * 1.7rem); /* Limit to 5 items before scrolling */
+    overflow-y: auto;
+}
+
+/* Scrollable Older Chats */
+.scrollable-older {
+    max-height: calc(5 * 1.7rem); /* Limit to 5 items before scrolling */
+    overflow-y: auto;
+}
+
+.scrollable-recent::-webkit-scrollbar,
+.scrollable-older::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable-recent::-webkit-scrollbar-thumb,
+.scrollable-older::-webkit-scrollbar-thumb {
+    background-color: #2a3344;
+    border-radius: 4px;
+}
+
+.scrollable-recent::-webkit-scrollbar-thumb:hover,
+.scrollable-older::-webkit-scrollbar-thumb:hover {
+    background-color: #ffc300;
+}
+
+/* Collapsible sections */
+.collapse-indicator {
+    font-size: 14px;
+    color: #ffc300;
+    margin-right: 8px;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.collapsed .collapse-indicator {
+    transform: rotate(-90deg);
+}
+
+.collapsed .section-content {
+    display: none;
+}
+
+/* Projects dynamic sizing */
+.projects-container {
+    transition: max-height 0.3s ease;
+}
+
+/* Custom scrollbar with matching blue arrows */
+::-webkit-scrollbar-button:single-button {
+    background-color: #1a2332;
+    display: block;
+    height: 10px;
+    width: 8px;
+    border-radius: 4px;
+}
+
+/* Up Arrow */
+::-webkit-scrollbar-button:vertical:decrement {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'><path d='M0 5 L4 0 L8 5 Z' fill='%232a3344'/></svg>");
+    background-position: center 3px;
+    background-repeat: no-repeat;
+}
+
+/* Down Arrow */
+::-webkit-scrollbar-button:vertical:increment {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'><path d='M0 0 L4 5 L8 0 Z' fill='%232a3344'/></svg>");
+    background-position: center 3px;
+    background-repeat: no-repeat;
+}
+
+/* === Modal Styling === */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: #121922;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #1a2332;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.close-button {
+    color: #ffc300;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #ffcc33;
+}
+
+.modal h2 {
+    color: #ffc300;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #ddd;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="file"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #1a2332;
+    border: 1px solid #2a3344;
+    color: white;
+    font-size: 16px;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.upload-button,
+.cancel-button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.upload-button {
+    background-color: #ffc300;
+    color: #121922;
+    border: none;
+}
+
+.upload-button:hover {
+    background-color: #ffcc33;
+}
+
+.cancel-button {
+    background-color: transparent;
+    color: #ddd;
+    border: 1px solid #2a3344;
+}
+
+.cancel-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* File upload progress */
+.upload-progress {
+    height: 5px;
+    width: 100%;
+    background-color: #1a2332;
+    margin-top: 10px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #ffc300;
+    transition: width 0.3s ease;
+}
+
+.upload-status {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #ddd;
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+.toast {
+    background-color: #1a2332;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    border-left: 4px solid #ffc300;
+    margin-bottom: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 300px;
+    max-width: 500px;
+    animation: slideIn 0.5s, fadeOut 0.5s 4.5s;
+    animation-fill-mode: forwards;
+}
+
+.toast-close {
+    color: #ddd;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.toast-close:hover {
+    color: white;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* File upload indicator in chat */
+.file-upload-indicator {
+    padding: 8px 12px;
+    background-color: #1a2332;
+    border-radius: 5px;
+    color: #ffc300;
+    margin: 10px 0;
+    font-style: italic;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* File preview in chat */
+.file-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #1a2332;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.file-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2a3344;
+    border-radius: 5px;
+}
+
+.file-details {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: bold;
+    color: #ffc300;
+    margin-bottom: 5px;
+}
+
+.file-meta {
+    font-size: 12px;
+    color: #999;
+}
+
+/* === Modal Styling === */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: #121922;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #1a2332;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.close-button {
+    color: #ffc300;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #ffcc33;
+}
+
+.modal h2 {
+    color: #ffc300;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #ddd;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="file"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #1a2332;
+    border: 1px solid #2a3344;
+    color: white;
+    font-size: 16px;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.upload-button,
+.cancel-button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.upload-button {
+    background-color: #ffc300;
+    color: #121922;
+    border: none;
+}
+
+.upload-button:hover {
+    background-color: #ffcc33;
+}
+
+.cancel-button {
+    background-color: transparent;
+    color: #ddd;
+    border: 1px solid #2a3344;
+}
+
+.cancel-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* File upload progress */
+.upload-progress {
+    height: 5px;
+    width: 100%;
+    background-color: #1a2332;
+    margin-top: 10px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #ffc300;
+    transition: width 0.3s ease;
+}
+
+.upload-status {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #ddd;
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+.toast {
+    background-color: #1a2332;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    border-left: 4px solid #ffc300;
+    margin-bottom: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 300px;
+    max-width: 500px;
+    animation: slideIn 0.5s, fadeOut 0.5s 4.5s;
+    animation-fill-mode: forwards;
+}
+
+.toast-close {
+    color: #ddd;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.toast-close:hover {
+    color: white;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* File upload indicator in chat */
+.file-upload-indicator {
+    padding: 8px 12px;
+    background-color: #1a2332;
+    border-radius: 5px;
+    color: #ffc300;
+    margin: 10px 0;
+    font-style: italic;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* File preview in chat */
+.file-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #1a2332;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.file-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2a3344;
+    border-radius: 5px;
+}
+
+.file-details {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: bold;
+    color: #ffc300;
+    margin-bottom: 5px;
+}
+
+.file-meta {
+    font-size: 12px;
+    color: #999;
+}

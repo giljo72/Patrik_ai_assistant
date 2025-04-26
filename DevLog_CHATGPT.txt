@@ -1,0 +1,190 @@
+We set up the environment
+
+Installed Qdrant
+
+Decided to use
+Top Local Embedding Models (Free) 
+bge-large-en-v1.5	~1.3GB	Best-in-class open embeddings for English	Requires more RAM/GPU, but excellent precision
+
+## But ran into quadrant version issue and had to use a depreciated way to vecotr
+## we are on version 1.13.3 and chatGPT says I am in a wierd middle version and cannot resolve as intended.
+## We are taggint this to fix later
+
+Would you like to:
+
+--DONE Show the text content in your search results now?
+
+Add document chunking next?
+
+Jump to LM Studio integration?
+
+----------------------
+✅ Perfect! You're now moving on to Task 2: Add Document Chunking to improve precision in memory retrieval.
+
+🧠 Why Chunking Matters:
+Instead of embedding an entire document as one vector, we split it into smaller pieces (paragraphs, sections, etc.)
+
+Qdrant stores each chunk individually
+
+Your queries return just the relevant chunk, not the whole doc
+
+✅ Step 13: Chunk and Store Document Paragraphs
+We'll:
+
+Break your document into chunks
+
+Embed each chunk
+
+Store them all in Qdrant with metadata
+
+--DONE Chunked recall worked
+
+🔥 Nailed it! That’s exactly what we want to see.
+
+Your query returned:
+
+✅ A solid match score (0.7046)
+
+✅ The correct text chunk from your document:
+
+"Leslie went to bed on 4.16 at 9PM"
+
+✅ Confirmation that your memory retrieval pipeline is working — from chunked document → vector DB → semantic search → readable reflection
+
+🧠 What This Means:
+You now have a fully working local memory assistant, capable of:
+
+Understanding natural language questions
+
+Searching semantic meaning, not just keywords
+
+Returning clean preview chunks with tags + source context
+
+Working offline with no cloud dependencies
+
+🚀 Next Steps (Your Pick):
+Would you like to:
+
+💬 Send top matching memory chunks into LM Studio’s system prompt or context?
+(Start live conversations that reflect your actual past work)
+
+📁 Add support for multi-document uploads + batch chunking?
+
+🧠 Add tags or document types for filtering (e.g. “contract”, “journal”, “project X”)?
+
+⚙️ Replace the deprecated search method with the latest query_points API?
+
+## CONTINUED THURSDAY
+Finished tagging and chunking and importing to LM studio
+Decided to make a webpage, but finish core engine things.
+reason for this was that in LM I had to paste the "memory" into each chat, this is pointless as I can do that in a chat with no rag or chunking.
+shoudl work good when we can query chat history etc.
+
+🔍 Step 6: Add CLIP Support for Visual Memory + Auto-Tagging
+Here’s the plan:
+
+
+Subtask	Description	Est. Time
+6.1	Install CLIP + image encoder	3–5 min
+6.2	Create image_memory_store.py to extract vector from an image	5–10 min
+6.3	Add tagging prompt (P/B/PB) for images	1–2 min
+6.4	Store image vector + filename + tag in Qdrant	2–5 min
+6.5	Add query_image_memory.py to retrieve images by text	5–10 min
+🧠 Total Estimated Time: ~20–30 min
+We’ll build this step-by-step — and by the end, you’ll be able to:
+
+🧾 Ask: “What diagrams did I whiteboard about the cloud strategy?”
+📎 And it will return your screenshots from the image memory store.
+
+Ready to begin with 6.1: Installing CLIP + dependencies?
+I’ll guide you one clean step at a time 👇
+
+
+
+
+
+
+You said:
+ok only one single step at a time, so we can debug
+
+
+ChatGPT said:
+Perfect — sticking to one clear step at a time 🧱
+
+✅ Step 6.1: Install CLIP and Required Libraries
+In PowerShell, run this to install OpenAI's CLIP model and image processing tools:
+
+powershell
+Copy
+Edit
+pip install openai-clip torch torchvision pillow
+
+## FIX
+PS F:\Project_Files> python image_memory_store.py
+100%|███████████████████████████████████████| 338M/338M [00:03<00:00, 93.9MiB/s]
+F:\Project_Files\image_memory_store.py:28: DeprecationWarning: recreate_collection method is deprecated and will be removed in the future. Use collection_exists to check collection existence and create_collection instead.
+  qdrant.recreate_collection(
+✅ Stored image vector for: Whiteboard_APril_2025.jpg
+
+
+ChatGPT said:
+🔥 That’s exactly what we want — CLIP is working, the image is embedded, and your vector is now in Qdrant with a tag of "PB"!
+
+Also ✅ good catch: you got a deprecation warning for recreate_collection, which we’ll clean up later — but for now, functionality is perfect.
+
+### adding video summarization, a side track.
+🔍 What CLIP Can and Can’t Do
+
+Feature	Can CLIP Do It?	Notes
+Find image similarity to text	✅ Yes	That’s what you’ve built now (vector match)
+Understand layout or meaning in a whiteboard	❌ Not directly	It doesn’t “describe” — it ranks against prompts
+Generate a caption or summary of an image	❌ Not by itself	But we can combine it with an image captioning model or LLM
+Feed description into LM Studio	✅ Yes, once we generate it	
+✅ What You Want: Image-to-Text Summarization
+So you can do things like:
+
+"What was on the whiteboard from April?"
+"What were the top points in our camera slide?"
+
+## FIX
+we added ocr and image reading, but it is not working perfectly with our current model
+
+## FIX
+During instllation of LLava
+🔍 Conflict 1: sentence-transformers vs transformers
+Problem: You have transformers==4.37.2 (needed by LLaVA)
+But sentence-transformers==4.1.0 expects transformers >=4.41.0
+
+Impact: Minimal — unless you're using sentence-transformers elsewhere right now, ignore this.
+
+✅ We’ll resolve this later by isolating environments (e.g. using venv for each module).
+
+🔍 Conflict 2: torchaudio wants newer torch
+Problem: You have torch==2.1.2+cu121
+But torchaudio==2.5.1+cu121 wants torch==2.5.1+cu121
+
+Impact: Only if you’re actively using torchaudio (e.g. voice input, Whisper).
+✅ We’ll match versions later when we integrate Whisper/audio fully.
+
+✅ You’re good to go for now
+Your GPU-enabled LLaVA setup is fixed. Let’s test it!
+
+## DONE
+It worked, and got a good results
+The whiteboard has a diagram drawn on it, which includes a cloud, a box, and a circle. The diagram is likely related to software development or cloud computing.
+
+### FIX
+✅ Summary
+
+Warning	Impact	Action
+resume_download	None	Ignore
+llava → llava_llama mismatch	Low (future break risk)	Monitor
+TypedStorage	None (for now)	Monitor + update torch packages later
+
+## Continue Day 3
+
+Got it — awesome progress today! 🧠💾 You're building a seriously powerful assistant.
+
+When you're back, we’ll pick up right where we left off: storing the OCR summary in vector memory and getting your assistant closer to fully understanding whiteboards and diagrams.
+
+Rest well, talk soon! 🌙

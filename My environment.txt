@@ -1,0 +1,114 @@
+
+
+
+F: = my root
+F:\Project_files = my Py files, env files and all other future scripts
+F:\AI_documents = documents root
+F:\AI_documents\incoming = where files are stored to be processed, where the web interface will place them as I upload them for processing
+F:\AI_documents\processed = where my log goes for proceesed files _processing_log.txt
+F:\AI_documents\processed\text_docs = where text type documents go
+F:\AI_documents\processed\Spreasheets = where spreadsheets go
+F:\AI_documents\processed\PPT = where powerpoints go
+F:\AI_documents\processed\Images = where images go
+F:\qdrant_storage = qdrant_storage
+F:\venv = unused at this time I think, please confirm
+F:\Git = git folder
+F:\Project_Files\LLaVA = llava folder with 7b model and 13b models installed
+F:\Project_Files\LLaVA\llava-v1.5-7b = 7b folder
+F:\Project_Files\LLaVA\llava-v1.5-13b = 13b folder
+F:\Project_Files\__pycache__ = unused at this time I think, please confirm
+F:\Project_files\Webpage = the webpage information, below is the structure
+F:
+├──Project_Files
+	├── app.py
+	├── Webpage\
+		├── templates\
+		│   ├── base.html      (new: common layout)
+		│   ├── index.html     (your chat window)
+		│   ├── file_manager.html (coming soon)
+		│   ├── attach.html    (coming soon)
+		│   └── search.html    (coming soon)
+		├── static\
+		│   ├── css\
+		│   │   └── style.css  (the one we just updated)
+		│   ├── js\
+		│   │   └── app.js     (will handle frontend logic)
+		│   └── images\
+		│       └── (icons: mic, paperclip, search, etc.)
+
+I have an anaconda env called Llava going
+I run docker.desktop with qdrant_storage, local server
+I run LMstudio with Llama 3 -13b but will probably change models around
+I run Flask for the website.
+
+
+Status 4/25
+📚 Local AI Assistant Project Summary
+🧩 Current Components:
+
+Area	Status
+Webpage (UI)	Built with Flask (base.html, index.html)
+Styling (CSS)	Dark theme, yellow accents, ChatGPT-style chat
+Front-end JS	Send messages, Typing indicator, File upload/Mic button placeholders
+Memory Store	Qdrant + SentenceTransformer for text and images
+Document Ingestion	store_incoming.py processes .txt, .docx, .images into memory
+Backend Model	LM Studio running Llama 3 13B locally
+Docker + Qdrant	Running locally via Docker Desktop
+Anaconda Environment	llava environment active
+🛠️ Major Functional Areas and Sub-Steps to Finish
+1. Web Interface Polish
+
+Sub-Step	Goal
+🔹 Replace 📎 🎤 emoji buttons with local SVGs	Stock, locally hosted icons
+🔹 Finalize chat input UX (press Enter/send button)	Done (already functional)
+🔹 Add real scroll behavior to chat history	Easy CSS tweak
+🔹 Clear placeholder text from index.html	Ready for production launch
+2. File Upload (Attach Button 📎)
+
+Sub-Step	Goal
+🔹 Clicking 📎 opens file picker	Basic input[type='file']
+🔹 Uploads file to F:/AI_documents/incoming/	Web server side save
+🔹 Triggers store_incoming.py automatically or manually	Background process / button
+3. Voice Input (Mic Button 🎤)
+
+Sub-Step	Goal
+🔹 Clicking 🎤 triggers Whisper model	(Local or backend Whisper API)
+🔹 Converts speech to text	Autofills the chat input field
+🔹 Sends as normal message	Just like typing manually
+4. Memory Search (Backend RAG Integration)
+
+Sub-Step	Goal
+🔹 Chat input POSTs message to /chat	Done ✅
+🔹 Server retrieves matching context from Qdrant	Done ✅ (retrieve_memory_context())
+🔹 Constructs augmented prompt for LLM	(already in app.py)
+🔹 Returns final LLM answer to user	Done ✅
+5. File Manager (coming soon in Webpage)
+
+Sub-Step	Goal
+🔹 file_manager.html page for listing uploaded docs/images	
+🔹 Delete, re-tag, and reprocess uploaded files	
+🔹 Browse incoming/processed folder contents	
+6. Backup, Organization, and Logs
+
+Sub-Step	Goal
+🔹 Regular backup of F:/AI_documents/processed/	
+🔹 Organize processed/ into subfolders (Text, Spreadsheets, Images)	(future minor tweak)
+🔹 Log all actions (_processing_log.txt)	Done ✅
+📂 Clean Folder Structure
+
+Path	Purpose
+F:/Project_Files/Webpage/templates/	Flask HTML templates
+F:/Project_Files/Webpage/static/css/	CSS styling
+F:/Project_Files/Webpage/static/js/	Frontend logic
+F:/Project_Files/Webpage/static/images/	Future SVGs/icons
+F:/AI_documents/incoming/	New uploads
+F:/AI_documents/processed/	Processed documents
+F:/qdrant_storage/	Vector database
+🚀 Critical Pieces for Fresh Chat Continuation
+✅ Webpage architecture
+✅ Chat system working
+✅ Placeholder UI ready
+✅ Qdrant vector storage active
+✅ LM Studio model connected
+✅ File processor store_incoming.py built
+

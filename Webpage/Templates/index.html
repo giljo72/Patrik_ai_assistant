@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Chat Messages Container -->
+<div id="chat-messages">
+    <!-- Welcome message when starting a new chat -->
+    {% if not chat_id or chat_history|default([])|length == 0 %}
+    <div class="ai-message">
+        <p>Welcome! I'm your AI assistant. I can help you with:</p>
+        <ul>
+            <li>Answering questions using your uploaded documents</li>
+            <li>Analyzing data from spreadsheets</li>
+            <li>Recalling information from previous conversations</li>
+            <li>Creating professional documents and presentations</li>
+        </ul>
+        <p>How can I assist you today?</p>
+    </div>
+    {% endif %}
+    
+    <!-- Chat history will be populated here -->
+</div>
+
+<!-- Chat Input Area -->
+<div id="chat-input-container">
+    <div id="user-input-wrapper">
+        <span class="input-label">User Chat</span>
+        <input type="text" id="chat-input-field" placeholder="Ask me anything...">
+        
+        <div class="input-buttons">
+            <button id="attach-button" title="Attach File">
+                <img src="{{ url_for('static', filename='images/paperclip.png') }}" alt="Attach" class="icon-image">
+            </button>
+            <button id="mic-button" title="Voice Input">
+                <img src="{{ url_for('static', filename='images/mic.png') }}" alt="Mic" class="icon-image">
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

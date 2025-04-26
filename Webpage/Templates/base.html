@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local AI Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Hidden data for the JS -->
+    <div id="chat-id-holder" data-chat-id="{{ chat_id }}" style="display: none;"></div>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div id="logo">
+                <h1>AI Assistant</h1>
+            </div>
+
+            <!-- Projects Section in base.html -->
+            <div class="sidebar-section projects-section">
+                <div class="section-header">
+                    <h2>Projects</h2>
+                    <button class="add-button" id="add-project-button" title="Add new project">
+                        <span class="plus-sign">+</span>
+                    </button>
+                </div>
+                <div class="projects-container">
+                    <ul class="sidebar-list project-list" id="project-list">
+                    <!-- Projects will be dynamically added here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Recent Chats Section -->
+            <div class="sidebar-section">
+                <div class="section-header">
+                    <h2>Recent Chats</h2>
+                    <button class="add-button" id="add-recent-chat-button" title="Add new chat">
+                        <span class="plus-sign">+</span>
+                    </button>
+                </div>
+                <div class="max-items-note"></div>
+                <ul class="sidebar-list scrollable-recent" id="recent-chat-list">
+                    <!-- Recent chats will be dynamically inserted here -->
+                </ul>
+            </div>
+
+            <!-- Older Chats Section -->
+            <div class="sidebar-section">
+                <div class="section-header">
+                    <h2>Chats older than a week</h2>
+                </div>
+                <div class="max-items-note"></div>
+                <ul class="sidebar-list scrollable-older" id="older-chat-list">
+                    <!-- Older chats will be dynamically inserted here -->
+                </ul>
+            </div>
+
+            <!-- Bottom Action Buttons -->
+            <div class="bottom-actions">
+                <button class="bottom-action-button" id="new-chat-button">+</button>
+                <button class="bottom-action-button" id="voice-button">Mic</button>
+                <button class="bottom-action-button" id="file-button">File</button>
+                <button class="bottom-action-button" id="docs-button">Docs</button>
+                <button class="bottom-action-button" id="search-button">Search</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main id="content-area">
+            <!-- Options/Settings at the top -->
+            <div class="top-header">
+                <div id="project-chat-title">
+                    <span id="project-name">{{ project or "" }}</span>
+                    <span class="title-separator">\</span>
+                    <span id="chat-name">{{ chat_name or "New Chat" }}</span>
+                </div>
+                <div class="options-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            
+            <!-- Chat Display Area -->
+            <div id="chat-display">
+                {% block content %}{% endblock %}
+            </div>
+            
+            <!-- File Upload Modal -->
+            <div id="file-upload-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h2>Upload File</h2>
+                    <form id="file-upload-form" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="file-input">Select File:</label>
+                            <input type="file" id="file-input" name="file" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tag-select">Tag:</label>
+                            <select id="tag-select" name="tag" required>
+                                <option value="">-- Select Tag --</option>
+                                <option value="P">Private (P)</option>
+                                <option value="B">Business (B)</option>
+                                <option value="PB">Either (PB)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="project-select">Project (Optional):</label>
+                            <select id="project-select" name="project">
+                                <option value="">-- No Project --</option>
+                                <!-- Projects will be dynamically added here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="file-description">Description:</label>
+                            <textarea id="file-description" name="description" rows="3" placeholder="Enter file description..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="upload-button">Upload</button>
+                            <button type="button" class="cancel-button">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
