@@ -101,4 +101,49 @@ def check_embedding_model():
         # Test encoding
         test_text = "This is a test sentence to check if encoding works."
         print("   Encoding test sentence...")
-        start_time = t
+        start_time = time.time()
+        encoding = model.encode(test_text)
+        encode_time = time.time() - start_time
+        
+        print(f"✅ Text encoding successful in {encode_time:.2f} seconds")
+        print(f"   Encoding dimensions: {len(encoding)}")
+        
+        return True
+    except Exception as e:
+        print(f"❌ Error loading embedding model: {type(e).__name__}: {e}")
+        return False
+
+def main():
+    print("=" * 60)
+    print("Local AI Assistant Diagnostics")
+    print("=" * 60)
+    
+    # Run checks
+    python_ok = check_python_version()
+    directories_ok = check_directories()
+    qdrant_ok = check_qdrant()
+    lm_studio_ok = check_lm_studio()
+    embedding_ok = check_embedding_model()
+    
+    # Summary
+    print("\n" + "=" * 60)
+    print("Diagnostics Summary")
+    print("=" * 60)
+    print(f"Python version: {'✅' if python_ok else '❌'}")
+    print(f"Directory structure: {'✅' if directories_ok else '❌'}")
+    print(f"Qdrant database: {'✅' if qdrant_ok else '❌'}")
+    print(f"LM Studio API: {'✅' if lm_studio_ok else '❌'}")
+    print(f"Embedding model: {'✅' if embedding_ok else '❌'}")
+    
+    # Overall status
+    if all([python_ok, directories_ok, qdrant_ok, lm_studio_ok, embedding_ok]):
+        print("\n✅ All components working correctly!")
+        print("You can start the application with: python app.py")
+    else:
+        print("\n⚠️ Some components need attention")
+        print("Please fix the issues marked with ❌ before starting the application")
+    
+    print("=" * 60)
+
+if __name__ == "__main__":
+    main()
