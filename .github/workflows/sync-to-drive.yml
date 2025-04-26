@@ -1,4 +1,4 @@
-name: Sync to Google Drive
+name: Sync Individual Files to Google Drive
 
 on:
   push:
@@ -13,15 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      # First, upload zip file as before (this part works)
-      - name: Upload to Google Drive as zip
-        uses: Jodebu/upload-to-drive@master
-        with:
-          target: .
-          credentials: ${{ secrets.DRIVE_CREDENTIALS }}
-          folder: ${{ secrets.DRIVE_FOLDER_ID }}
-      
-      # Now, add steps to extract the files
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -29,55 +20,69 @@ jobs:
       
       - name: Install Google API client
         run: |
-          pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+          pip install google-auth google-api-python-client
       
-      - name: Extract files in Drive folder
+      - name: Sync files to Google Drive
         run: |
+          # Save credentials from GitHub secret
           echo "${{ secrets.DRIVE_CREDENTIALS }}" | base64 -d > service_account.json
+          
+          # Create and run Python script to sync files
           python - << 'EOF'
-          import json
           import os
-          from googleapiclient.discovery import build
+          import fnmatch
           from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.http import MediaFileUpload
 
-          # Load credentials
+          # Setup credentials and Drive API client
           SCOPES = ['https://www.googleapis.com/auth/drive']
           credentials = service_account.Credentials.from_service_account_file('service_account.json', scopes=SCOPES)
           drive_service = build('drive', 'v3', credentials=credentials)
-
-          # Get the most recent zip file in the folder
+          
+          # Target Google Drive folder ID
           folder_id = '${{ secrets.DRIVE_FOLDER_ID }}'
           
-          # Find all zip files in the folder
-          results = drive_service.files().list(
-              q=f"'{folder_id}' in parents and mimeType contains 'application/zip' and trashed = false",
-              orderBy="createdTime desc",
-              pageSize=1,
-              fields="files(id, name)"
-          ).execute()
+          # Patterns to exclude
+          exclude_patterns = ['.git*', 'service_account.json']
           
-          files = results.get('files', [])
-          if not files:
-              print("No zip files found in folder")
-              exit(0)
+          # Keep track of folder IDs
+          folder_ids = {'.': folder_id}
+          
+          def should_exclude(path):
+              """Check if path should be excluded from sync."""
+              for pattern in exclude_patterns:
+                  if fnmatch.fnmatch(path, pattern):
+                      return True
+              return False
+          
+          def get_or_create_folder(folder_name, parent_id):
+              """Get or create a folder in Drive and return its ID."""
+              if folder_name in folder_ids:
+                  return folder_ids[folder_name]
+                  
+              # Check if folder exists
+              query = f"name = '{folder_name}' and '{parent_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+              results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+              items = results.get('files', [])
               
-          # Get the most recent zip file
-          zip_file_id = files[0]['id']
-          zip_file_name = files[0]['name']
-          print(f"Found zip file: {zip_file_name}")
-          
-          # Create a subfolder with repository name
-          repo_name = os.environ.get('GITHUB_REPOSITORY', '').split('/')[-1]
-          if not repo_name:
-              repo_name = 'github-files'
+              if items:
+                  # Use existing folder
+                  folder_id = items[0]['id']
+              else:
+                  # Create new folder
+                  file_metadata = {
+                      'name': folder_name,
+                      'mimeType': 'application/vnd.google-apps.folder',
+                      'parents': [parent_id]
+                  }
+                  folder = drive_service.files().create(body=file_metadata, fields='id').execute()
+                  folder_id = folder.get('id')
+                  print(f"Created folder: {folder_name}")
               
-          # Check if the folder already exists
-          results = drive_service.files().list(
-              q=f"'{folder_id}' in parents and name = '{repo_name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
-              fields="files(id, name)"
-          ).execute()
+              folder_ids[folder_name] = folder_id
+              return folder_id
           
-          folders = results.get('files', [])
-          if folders:
-              repo_folder_id = folders[0]['id']
-              print(f"Using
+          def upload_file(file_path, parent_id):
+              """Upload a file to Google Drive. If it exists, update it."""
+              file_name = os.path.basename(file_path)
