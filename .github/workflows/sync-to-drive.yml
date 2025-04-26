@@ -1,0 +1,21 @@
+name: Sync to Google Drive
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  upload-to-drive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Upload to Google Drive
+        uses: Jodebu/upload-to-drive@master
+        with:
+          target: .
+          credentials: ${{ secrets.DRIVE_CREDENTIALS }}
+          folder: ${{ secrets.DRIVE_FOLDER_ID }}
