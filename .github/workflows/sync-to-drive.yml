@@ -13,41 +13,71 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      # This step installs the Google Drive CLI tool
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v1  # Updated to v1
+      # First, upload zip file as before (this part works)
+      - name: Upload to Google Drive as zip
+        uses: Jodebu/upload-to-drive@master
         with:
-          service_account_key: ${{ secrets.DRIVE_CREDENTIALS }}
-          export_default_credentials: true
+          target: .
+          credentials: ${{ secrets.DRIVE_CREDENTIALS }}
+          folder: ${{ secrets.DRIVE_FOLDER_ID }}
       
-      # Install Google Drive CLI
-      - name: Install Drive CLI
-        run: |
-          pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+      # Now, add steps to extract the files
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       
-      # Upload files individually
-      - name: Upload files to Google Drive
+      - name: Install Google API client
         run: |
-          # Create a Python script to upload files
-          cat > upload_to_drive.py << 'EOF'
-          from googleapiclient.discovery import build
-          from googleapiclient.http import MediaFileUpload
+          pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+      
+      - name: Extract files in Drive folder
+        run: |
+          echo "${{ secrets.DRIVE_CREDENTIALS }}" | base64 -d > service_account.json
+          python - << 'EOF'
+          import json
           import os
-          import mimetypes
-          import google.auth
-          
-          # Authenticate with service account
-          credentials, project = google.auth.default()
-          service = build('drive', 'v3', credentials=credentials)
-          
-          # Folder ID from repository secrets
+          from googleapiclient.discovery import build
+          from google.oauth2 import service_account
+
+          # Load credentials
+          SCOPES = ['https://www.googleapis.com/auth/drive']
+          credentials = service_account.Credentials.from_service_account_file('service_account.json', scopes=SCOPES)
+          drive_service = build('drive', 'v3', credentials=credentials)
+
+          # Get the most recent zip file in the folder
           folder_id = '${{ secrets.DRIVE_FOLDER_ID }}'
           
-          # Function to upload a file
-          def upload_file(file_path, parent_id):
-              file_name = os.path.basename(file_path)
+          # Find all zip files in the folder
+          results = drive_service.files().list(
+              q=f"'{folder_id}' in parents and mimeType contains 'application/zip' and trashed = false",
+              orderBy="createdTime desc",
+              pageSize=1,
+              fields="files(id, name)"
+          ).execute()
+          
+          files = results.get('files', [])
+          if not files:
+              print("No zip files found in folder")
+              exit(0)
               
-              # Check if file exists in the Drive folder
-              query = f"name = '{file_name}' and '{parent_id}' in parents and trashed = false"
-              results = service.files().list(q=query, fields="files(id, name)").execute()
-              files = results.get('files', [])
+          # Get the most recent zip file
+          zip_file_id = files[0]['id']
+          zip_file_name = files[0]['name']
+          print(f"Found zip file: {zip_file_name}")
+          
+          # Create a subfolder with repository name
+          repo_name = os.environ.get('GITHUB_REPOSITORY', '').split('/')[-1]
+          if not repo_name:
+              repo_name = 'github-files'
+              
+          # Check if the folder already exists
+          results = drive_service.files().list(
+              q=f"'{folder_id}' in parents and name = '{repo_name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+              fields="files(id, name)"
+          ).execute()
+          
+          folders = results.get('files', [])
+          if folders:
+              repo_folder_id = folders[0]['id']
+              print(f"Using
