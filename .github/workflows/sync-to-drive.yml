@@ -22,6 +22,13 @@ jobs:
         run: |
           pip install google-auth google-api-python-client
       
+      - name: List repository files
+        run: |
+          echo "Repository contents:"
+          ls -la
+          echo "Total files:"
+          find . -type f | wc -l
+      
       - name: Sync files to Google Drive
         run: |
           # Save credentials from GitHub secret
@@ -31,17 +38,26 @@ jobs:
           python - << 'EOF'
           import os
           import fnmatch
+          import traceback
           from google.oauth2 import service_account
           from googleapiclient.discovery import build
           from googleapiclient.http import MediaFileUpload
 
           # Setup credentials and Drive API client
-          SCOPES = ['https://www.googleapis.com/auth/drive']
-          credentials = service_account.Credentials.from_service_account_file('service_account.json', scopes=SCOPES)
-          drive_service = build('drive', 'v3', credentials=credentials)
+          try:
+              print("Setting up Drive API client...")
+              SCOPES = ['https://www.googleapis.com/auth/drive']
+              credentials = service_account.Credentials.from_service_account_file('service_account.json', scopes=SCOPES)
+              drive_service = build('drive', 'v3', credentials=credentials)
+              print("Drive API client setup successful")
+          except Exception as e:
+              print(f"ERROR setting up Drive API client: {str(e)}")
+              traceback.print_exc()
+              exit(1)
           
           # Target Google Drive folder ID
           folder_id = '${{ secrets.DRIVE_FOLDER_ID }}'
+          print(f"Target folder ID: {folder_id}")
           
           # Patterns to exclude
           exclude_patterns = ['.git*', 'service_account.json']
@@ -58,31 +74,107 @@ jobs:
           
           def get_or_create_folder(folder_name, parent_id):
               """Get or create a folder in Drive and return its ID."""
+              print(f"Processing folder: {folder_name}")
               if folder_name in folder_ids:
                   return folder_ids[folder_name]
                   
               # Check if folder exists
               query = f"name = '{folder_name}' and '{parent_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
-              results = drive_service.files().list(q=query, fields="files(id, name)").execute()
-              items = results.get('files', [])
-              
-              if items:
-                  # Use existing folder
-                  folder_id = items[0]['id']
-              else:
-                  # Create new folder
-                  file_metadata = {
-                      'name': folder_name,
-                      'mimeType': 'application/vnd.google-apps.folder',
-                      'parents': [parent_id]
-                  }
-                  folder = drive_service.files().create(body=file_metadata, fields='id').execute()
-                  folder_id = folder.get('id')
-                  print(f"Created folder: {folder_name}")
-              
-              folder_ids[folder_name] = folder_id
-              return folder_id
+              try:
+                  results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+                  items = results.get('files', [])
+                  
+                  if items:
+                      # Use existing folder
+                      folder_id = items[0]['id']
+                      print(f"Using existing folder: {folder_name} (ID: {folder_id})")
+                  else:
+                      # Create new folder
+                      file_metadata = {
+                          'name': folder_name,
+                          'mimeType': 'application/vnd.google-apps.folder',
+                          'parents': [parent_id]
+                      }
+                      folder = drive_service.files().create(body=file_metadata, fields='id').execute()
+                      folder_id = folder.get('id')
+                      print(f"Created folder: {folder_name} (ID: {folder_id})")
+                  
+                  folder_ids[folder_name] = folder_id
+                  return folder_id
+              except Exception as e:
+                  print(f"ERROR creating/finding folder {folder_name}: {str(e)}")
+                  traceback.print_exc()
+                  return parent_id
           
           def upload_file(file_path, parent_id):
               """Upload a file to Google Drive. If it exists, update it."""
               file_name = os.path.basename(file_path)
+              print(f"Processing file: {file_path}")
+              
+              try:
+                  # Check if file exists
+                  query = f"name = '{file_name}' and '{parent_id}' in parents and trashed = false"
+                  results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+                  items = results.get('files', [])
+                  
+                  # Prepare file metadata and media
+                  file_metadata = {
+                      'name': file_name,
+                      'parents': [parent_id]
+                  }
+                  
+                  media = MediaFileUpload(file_path, resumable=True)
+                  
+                  if items:
+                      # Update existing file
+                      file_id = items[0]['id']
+                      updated_file = drive_service.files().update(
+                          fileId=file_id,
+                          body=file_metadata,
+                          media_body=media,
+                          fields='id'
+                      ).execute()
+                      print(f"Updated file: {file_path} (ID: {updated_file.get('id')})")
+                  else:
+                      # Upload new file
+                      created_file = drive_service.files().create(
+                          body=file_metadata,
+                          media_body=media,
+                          fields='id'
+                      ).execute()
+                      print(f"Uploaded file: {file_path} (ID: {created_file.get('id')})")
+              except Exception as e:
+                  print(f"ERROR uploading file {file_path}: {str(e)}")
+                  traceback.print_exc()
+          
+          def process_directory(directory_path, parent_id):
+              """Process a directory, creating folders and uploading files."""
+              print(f"Processing directory: {directory_path}")
+              try:
+                  items = os.listdir(directory_path)
+                  print(f"Found {len(items)} items in {directory_path}")
+                  
+                  for item in items:
+                      item_path = os.path.join(directory_path, item)
+                      
+                      # Skip excluded items
+                      if should_exclude(item_path):
+                          print(f"Skipping excluded item: {item_path}")
+                          continue
+                          
+                      if os.path.isdir(item_path):
+                          # Create folder and recursively process contents
+                          folder_id = get_or_create_folder(item, parent_id)
+                          process_directory(item_path, folder_id)
+                      else:
+                          # Upload file
+                          upload_file(item_path, parent_id)
+              except Exception as e:
+                  print(f"ERROR processing directory {directory_path}: {str(e)}")
+                  traceback.print_exc()
+          
+          # Start processing from the root directory
+          print("Starting file sync...")
+          process_directory('.', folder_id)
+          print("File sync completed")
+          EOF
