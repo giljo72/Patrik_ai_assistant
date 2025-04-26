@@ -1,0 +1,15 @@
+flask
+qdrant-client
+sentence-transformers
+python-dotenv
+requests
+pillow
+python-docx
+striprtf
+pymupdf
+pandas
+torch
+torchvision
+accelerate
+transformers
+bitsandbytes
