@@ -15,7 +15,7 @@ jobs:
       
       # This step installs the Google Drive CLI tool
       - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/setup-gcloud@v1  # Updated to v1
         with:
           service_account_key: ${{ secrets.DRIVE_CREDENTIALS }}
           export_default_credentials: true
@@ -47,4 +47,7 @@ jobs:
           def upload_file(file_path, parent_id):
               file_name = os.path.basename(file_path)
               
-              # Check if file exists in
+              # Check if file exists in the Drive folder
+              query = f"name = '{file_name}' and '{parent_id}' in parents and trashed = false"
+              results = service.files().list(q=query, fields="files(id, name)").execute()
+              files = results.get('files', [])
