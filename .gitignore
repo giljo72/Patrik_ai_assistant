@@ -1,0 +1,52 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment and virtual environments
+.env
+venv/
+env/
+ENV/
+
+# Python/Anaconda environments
+anaconda/
+miniconda/
+conda-env/
+.conda/
+envs/
+*.yml
+environment.yml
+env.yml
+LLaVA/  # Your specific Anaconda environment
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Large model files
+F:/Project_Files/LLaVA/
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Local storage
+F:/qdrant_storage/
+F:/AI_documents/chat_history/
+F:/AI_documents/incoming/
+F:/AI_documents/processed/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
